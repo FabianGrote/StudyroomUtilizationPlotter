@@ -3,7 +3,6 @@ import fnmatch
 import numpy as np
 import pandas
 import matplotlib.pyplot as plt
-#from numpy import *
 import sqlite3
 
 # Create SQLite database
@@ -66,7 +65,7 @@ def read_data_to_sql(db_file):
 
 
 # Method to calculate room utilization per room per timeslot and safe the results in table 'results'
-def process_data():
+def process_data(db_file):
 	connection = sqlite3.connect(db_file)
 
 	for w in ['Infobib', 'KleinerLernraum', 'Einzelarbeitsraum']:
@@ -86,17 +85,32 @@ def process_data():
 
 
 # Method to plot data from a SQL file and visualize it in a GUI
-def plot_data(db_file)
-	#plt.plot(x,Infobib_min, 'o')
-	#plt.plot(x,Infobib_average, 'g')
-	#plt.plot(x,Infobib_max, 'y')
-
-
-	#plt.plot(x,Stillarbeitsraum_min)
-	#plt.plot(x,Stillarbeitsraum_average)
-	#plt.plot(x,Stillarbeitsraum_max)
-
-	#plt.show()
+def plot_data(db_file):
+	connection = sqlite3.connect(db_file)
+	crsr = connection.cursor()
+	crsr.execute("SELECT Weekday, Timeslot, NumberOfReservations FROM results WHERE room = 'Infobib' and CalendarWeek = '4'")
+	
+	# Extract SQL values to lists that can be used by the Matplotlib librarie
+	timeslots = []
+	reservations = []
+	
+	for i in crsr:
+		timeslots.append(i[0] + i[1])
+		#timeslots.append(i[0])
+		print(i[2])
+		reservations.append(int(i[2]))
+	
+	connection.close()
+	
+	# Visualizing data using Matplotlib librarie
+	
+	#plt.xlim([0, x_max])
+	plt.ylim([0, 50])
+	plt.xlabel("Timeslot")
+	plt.ylabel("Number of reservations")
+	plt.title("Study room reservations during the month")
+	plt.plot(timeslots, reservations)
+	plt.show()
 
 		
 
@@ -111,7 +125,7 @@ schemaResults_file = 'schemaResults.sql'
 
 #initial_DB_connect(db_file, schemaDataStorage_file, schemaResults_file)
 #read_data_to_sql(db_file)
-process_data(db_file)
+#process_data(db_file)
 plot_data(db_file)
 
 
